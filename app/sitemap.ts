@@ -17,5 +17,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...nucleos.map((n) => entry(`/cercanias/${n.slug}`, "hourly", 0.8)),
     ...lines.map((l) => entry(lineHref(l), "always", 0.8)),
     ...stations.map((s) => entry(`/estacion/${s.slug}`, "hourly", 0.6)),
+    ...["/aviso-legal", "/politica-privacidad", "/politica-cookies"].map((p) => entry(p, "yearly", 0.1)),
   ];
 }

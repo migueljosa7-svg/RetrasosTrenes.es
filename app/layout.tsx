@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { JsonLd, websiteJsonLd } from "@/components/JsonLd";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 import { RegisterSW } from "@/components/RegisterSW";
 import { StickyFooterAd } from "@/components/StickyFooterAd";
 import { ADS, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <StickyFooterAd slot={ADS.slotSticky} />
         <RegisterSW />
+        <PwaInstallPrompt />
 
         {GA_ID && (
           <>
