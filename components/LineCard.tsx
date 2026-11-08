@@ -13,7 +13,7 @@ export function LineCard({ line, showNucleo = true }: { line: Line; showNucleo?:
   return (
     <Link
       href={lineHref(line)}
-      className={`group block rounded-2xl border bg-neutral-900 p-4 transition active:scale-[0.99] hover:bg-neutral-800/80 ${m.border}`}
+      className={`group block rounded-2xl border bg-neutral-900 p-4 transition duration-200 active:scale-[0.99] hover:-translate-y-0.5 hover:bg-neutral-800/80 ${m.border} ${m.cardGlow}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">

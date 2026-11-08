@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import "./globals.css";
+import { CookieBanner } from "@/components/CookieBanner";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { JsonLd, websiteJsonLd } from "@/components/JsonLd";
@@ -9,7 +9,6 @@ import { RegisterSW } from "@/components/RegisterSW";
 import { StickyFooterAd } from "@/components/StickyFooterAd";
 import { ADS, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 const GSC = process.env.NEXT_PUBLIC_GSC_VERIFICATION;
 
 const DEFAULT_TITLE = "Retrasos Cercanías Hoy: Estado de Trenes en Tiempo Real en España";
@@ -56,23 +55,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <StickyFooterAd slot={ADS.slotSticky} />
         <RegisterSW />
         <PwaInstallPrompt />
-
-        {GA_ID && (
-          <>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
-            <Script id="ga4-init" strategy="afterInteractive">
-              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}',{anonymize_ip:true});`}
-            </Script>
-          </>
-        )}
-        {ADS.client && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS.client}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
+        {/* GA4 y AdSense ya no se cargan aquí: los inyecta CookieBanner solo con consentimiento */}
+        <CookieBanner />
       </body>
     </html>
   );

@@ -15,7 +15,14 @@ export type Incident = {
   at: string; // ISO
 };
 
-export type Nucleo = { slug: string; name: string; region: string; operator: string; blurb: string };
+export type Nucleo = {
+  slug: string;
+  name: string;
+  region: string;
+  operator: string;
+  blurb: string;
+  coords: [number, number]; // [lat, lng]
+};
 
 export type Station = { slug: string; name: string; nucleo: string; incidents: Incident[] };
 
@@ -38,6 +45,7 @@ export const nucleos: Nucleo[] = [
     slug: "madrid",
     name: "Madrid",
     region: "Comunidad de Madrid",
+    coords: [40.4168, -3.7038],
     operator: "Cercanías Madrid",
     blurb: "Líneas C-1, C-2, C-5 y C-8 de la red de Cercanías de Madrid.",
   },
@@ -45,6 +53,7 @@ export const nucleos: Nucleo[] = [
     slug: "barcelona",
     name: "Barcelona",
     region: "Cataluña",
+    coords: [41.3874, 2.1686],
     operator: "Rodalies de Catalunya",
     blurb: "Líneas R1, R2 y R4 de Rodalies en el área metropolitana de Barcelona.",
   },
@@ -52,6 +61,7 @@ export const nucleos: Nucleo[] = [
     slug: "valencia",
     name: "Valencia",
     region: "Comunitat Valenciana",
+    coords: [39.4699, -0.3763],
     operator: "Cercanías Valencia",
     blurb: "Líneas C-1 y C-2 de Cercanías Valencia.",
   },
@@ -59,6 +69,7 @@ export const nucleos: Nucleo[] = [
     slug: "zaragoza",
     name: "Zaragoza",
     region: "Aragón",
+    coords: [41.6488, -0.8891],
     operator: "Cercanías Zaragoza",
     blurb: "Línea C-1 de Cercanías Zaragoza.",
   },
@@ -223,6 +234,30 @@ export function allIncidents(): FeedIncident[] {
   );
   return [...fromLines, ...fromStations].sort((a, b) => +new Date(b.at) - +new Date(a.at));
 }
+
+/** Datos serializables para el mapa (se pasan del servidor al componente cliente). */
+export type MapMarker = {
+  slug: string;
+  name: string;
+  coords: [number, number];
+  status: Status;
+  lines: { code: string; href: string; status: Status; delayMin: number; reason: string }[];
+};
+
+export const mapMarkers = (): MapMarker[] =>
+  nucleos.map((n) => ({
+    slug: n.slug,
+    name: n.name,
+    coords: n.coords,
+    status: nucleoStatus(n.slug),
+    lines: linesByNucleo(n.slug).map((l) => ({
+      code: l.code,
+      href: lineHref(l),
+      status: l.status,
+      delayMin: l.delayMin,
+      reason: l.reason,
+    })),
+  }));
 
 export type SearchItem = { type: "Línea" | "Estación"; label: string; sublabel: string; href: string; haystack: string };
 

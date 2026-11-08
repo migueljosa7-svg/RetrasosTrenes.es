@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { nucleos } from "@/data/lines";
 import { ADS, SITE_NAME } from "@/lib/site";
+import { CookieSettingsButton } from "./CookieSettingsButton";
 
 const LEGAL_LINKS = [
   { href: "/aviso-legal", label: "Aviso legal" },
@@ -49,6 +50,9 @@ export function Footer() {
                 </Link>
               </li>
             ))}
+            <li>
+              <CookieSettingsButton className="text-neutral-300 hover:text-sky-300" />
+            </li>
           </ul>
         </nav>
       </div>

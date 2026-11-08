@@ -1,12 +1,12 @@
 import { STATUS_META, type Status } from "@/lib/status";
 
+/** Semáforo con halo de neón; pulso suave si hay incidencia y parpadeo más marcado si es grave. */
 export function StatusDot({ status, className = "" }: { status: Status; className?: string }) {
+  const m = STATUS_META[status];
   return (
-    <span className={`relative inline-flex h-3 w-3 ${className}`} aria-hidden>
-      {status !== "ok" && (
-        <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 ${STATUS_META[status].dot}`} />
-      )}
-      <span className={`relative inline-flex h-3 w-3 rounded-full ${STATUS_META[status].dot}`} />
+    <span className={`relative inline-flex h-3 w-3 shrink-0 ${className}`} aria-hidden>
+      {status !== "ok" && <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 ${m.dot}`} />}
+      <span className={`relative inline-flex h-3 w-3 rounded-full ${m.dot} ${m.glow} ${status === "danger" ? "animate-pulse" : ""}`} />
     </span>
   );
 }

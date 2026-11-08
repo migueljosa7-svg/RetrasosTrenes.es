@@ -1,12 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useConsent } from "@/lib/consent";
 import { AdSlot } from "./AdSlot";
 
 export function StickyFooterAd({ slot }: { slot: string }) {
   const [open, setOpen] = useState(true);
+  const { consent } = useConsent();
   if (!open) return null;
+
   const hasAds = Boolean(process.env.NEXT_PUBLIC_ADSENSE_ID && slot);
+  if (hasAds && !consent?.ads) return null; // sin consentimiento publicitario no hay barra
   if (!hasAds && process.env.NODE_ENV === "production") return null;
 
   return (

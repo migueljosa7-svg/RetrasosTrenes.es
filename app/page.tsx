@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { allIncidents, buildSearchIndex, lines, nucleos, linesByNucleo, nucleoStatus } from "@/data/lines";
+import { allIncidents, buildSearchIndex, lines, mapMarkers, nucleos, linesByNucleo, nucleoStatus } from "@/data/lines";
+import { LiveMap } from "@/components/LiveMap";
+import { StatsWidgets } from "@/components/StatsWidgets";
 import { LineFeed } from "@/components/LineFeed";
 import { IncidentList } from "@/components/IncidentList";
 import { SearchBox } from "@/components/SearchBox";
@@ -17,6 +19,10 @@ export default function HomePage() {
     warn: lines.filter((l) => l.status === "warn").length,
     danger: lines.filter((l) => l.status === "danger").length,
   };
+  const ageMin = Math.max(
+    0,
+    Math.round((Date.now() - Math.max(...lines.map((l) => +new Date(l.updatedAt)))) / 60_000),
+  );
   const urgent = allIncidents()
     .filter((i) => i.status === "danger")
     .slice(0, 3);
@@ -32,6 +38,10 @@ export default function HomePage() {
         <h1 className="text-2xl font-black leading-tight text-neutral-50 sm:text-3xl">
           Retrasos de Cercanías y trenes hoy en España
         </h1>
+        <p className="mb-2 inline-flex items-center gap-2 rounded-full bg-red-500/10 px-2.5 py-1 text-[11px] font-bold tracking-widest text-red-300 ring-1 ring-red-500/30">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.8)]" aria-hidden />
+          EN DIRECTO
+        </p>
         <p className="mt-1 flex items-center gap-2 text-sm text-neutral-300">
           <StatusDot status={overall} />
           Estado general de la red: <strong className={STATUS_META[overall].text}>{STATUS_META[overall].short}</strong>
@@ -44,14 +54,18 @@ export default function HomePage() {
         </Suspense>
       </section>
 
-      <section aria-label="Resumen" className="mt-4 grid grid-cols-3 gap-2 text-center">
-        {(["ok", "warn", "danger"] as const).map((s) => (
-          <div key={s} className={`rounded-2xl border bg-neutral-900 p-3 ${STATUS_META[s].border}`}>
-            <p className={`text-3xl font-black ${STATUS_META[s].text}`}>{counts[s]}</p>
-            <p className="text-[11px] leading-tight text-neutral-400">{STATUS_META[s].short}</p>
-          </div>
-        ))}
-      </section>
+      <div className="mt-4">
+        <LiveMap markers={mapMarkers()} />
+      </div>
+
+      <div className="mt-4">
+        <StatsWidgets
+          operational={counts.ok}
+          total={lines.length}
+          activeIncidents={counts.warn + counts.danger}
+          ageMin={ageMin}
+        />
+      </div>
 
       {urgent.length > 0 && (
         <section className="mt-6" aria-labelledby="urgentes">

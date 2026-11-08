@@ -12,6 +12,7 @@ const rows = [
   { name: "_ga, _ga_*", provider: "Google Analytics 4", type: "Analítica", purpose: "Distinguir usuarios y medir el uso del sitio.", duration: "Hasta 2 años" },
   { name: "IDE, DSID y similares", provider: "Google (DoubleClick / AdSense)", type: "Publicitaria", purpose: "Mostrar y medir anuncios, y limitar su frecuencia.", duration: "Hasta 13 meses" },
   { name: "__gads, __gpi", provider: "Google AdSense", type: "Publicitaria", purpose: "Seleccionar anuncios y medir su rendimiento.", duration: "Hasta 13 meses" },
+  { name: "rt-consent", provider: "RetrasosTrenes.es (localStorage)", type: "Técnica", purpose: "Guardar tu elección sobre cookies. Analíticas y publicitarias no se cargan hasta que aceptas.", duration: "Hasta que lo borres" },
   { name: "rt-pwa-dismissed", provider: "RetrasosTrenes.es (localStorage)", type: "Técnica", purpose: "Recordar que cerraste el aviso de instalación.", duration: "Hasta que lo borres" },
 ];
 

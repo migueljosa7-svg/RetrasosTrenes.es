@@ -12,8 +12,153 @@ html {
 }
 
 body {
-  background: #0a0a0a;
   color: #e5e5e5;
+  background-color: #0a0a0a;
+  /* "Sala de control": resplandor superior + rejilla muy tenue */
+  background-image:
+    radial-gradient(60rem 28rem at 50% -8%, rgba(56, 189, 248, 0.09), transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: auto, 32px 32px, 32px 32px;
   /* hueco para el anuncio sticky inferior */
   padding-bottom: 5rem;
+}
+
+/* ───────── Leaflet: marcadores con halo y radar ───────── */
+.rt-marker-wrap {
+  background: transparent;
+  border: 0;
+}
+.rt-marker {
+  position: relative;
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: var(--c);
+  border: 3px solid #0a0a0a;
+  box-shadow: 0 0 16px 4px var(--c);
+}
+.rt-marker::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  border: 2px solid var(--c);
+  animation: rt-ping 2.4s ease-out infinite;
+}
+.rt-marker.rt-ok::after {
+  animation-duration: 4s;
+  opacity: 0.5;
+}
+.rt-marker.rt-danger::after {
+  animation-duration: 1.2s;
+}
+@keyframes rt-ping {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+/* ───────── Leaflet: popup y controles en tema oscuro ───────── */
+.rt-popup .leaflet-popup-content-wrapper {
+  background: #171717;
+  color: #e5e5e5;
+  border: 1px solid #404040;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+.rt-popup .leaflet-popup-tip {
+  background: #171717;
+  border: 1px solid #404040;
+}
+.rt-popup .leaflet-popup-content {
+  margin: 12px 14px;
+  font: inherit;
+}
+.rt-popup a.leaflet-popup-close-button {
+  color: #a3a3a3;
+}
+.rt-pop-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fafafa;
+}
+.rt-pop-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 8px;
+  margin: 0 -8px;
+  border-radius: 10px;
+  color: #e5e5e5 !important;
+  text-decoration: none;
+  font-size: 13px;
+}
+.rt-pop-line:hover {
+  background: #262626;
+}
+.rt-pop-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 4px;
+  border-radius: 9999px;
+}
+.rt-pop-body {
+  flex: 1;
+  min-width: 0;
+}
+.rt-pop-status {
+  color: #a3a3a3;
+}
+.rt-pop-reason {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #a3a3a3;
+}
+.rt-pop-go {
+  color: #7dd3fc;
+  font-size: 18px;
+  line-height: 1;
+}
+.leaflet-container {
+  font-family: inherit;
+  background: #0a0a0a;
+}
+.leaflet-container .leaflet-control-attribution {
+  background: rgba(10, 10, 10, 0.75);
+  color: #737373;
+}
+.leaflet-container .leaflet-control-attribution a {
+  color: #7dd3fc;
+}
+.leaflet-bar a,
+.leaflet-bar a:hover {
+  background: #171717;
+  color: #e5e5e5;
+  border-color: #404040;
+}
+
+/* Respeta a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .rt-marker::after {
+    animation: none;
+    opacity: 0;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
