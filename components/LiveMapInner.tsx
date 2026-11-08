@@ -62,10 +62,17 @@ export default function LiveMapInner({ markers }: { markers: MapMarker[] }) {
       attributionControl: true,
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      subdomains: "abcd",
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    // CARTO (dark_all / voyager) ahora exige API key y pinta "API KEY REQUIRED".
+    // Esri World Dark Gray: oscuro, sin clave. Nota: el orden de tesela es {z}/{y}/{x}.
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+      maxNativeZoom: 16,
+      maxZoom: 16,
+      attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ",
+    }).addTo(map);
+    // Capa de etiquetas (transparente) para ver nombres de ciudades sobre el fondo oscuro.
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}", {
+      maxNativeZoom: 16,
+      maxZoom: 16,
     }).addTo(map);
 
     const go = (href: string) => router.push(href);

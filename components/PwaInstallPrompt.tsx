@@ -3,61 +3,76 @@
 import { useEffect, useState } from "react";
 
 const KEY = "rt-pwa-dismissed";
+const MOBILE_QUERY = "(max-width: 767px)";
 
 // Evento no estándar (Chromium): lo tipamos a mano.
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
-function wasDismissed() {
+const wasDismissed = () => {
   try {
     return localStorage.getItem(KEY) === "1";
   } catch {
     return false;
   }
-}
+};
+const remember = () => {
+  try {
+    localStorage.setItem(KEY, "1");
+  } catch {
+    /* almacenamiento bloqueado */
+  }
+};
 
 export function PwaInstallPrompt() {
-  const [evt, setEvt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
-    if (wasDismissed()) return;
-    const onPrompt = (e: Event) => {
-      e.preventDefault(); // evita el mini-infobar nativo; mostramos el nuestro
-      setEvt(e as BeforeInstallPromptEvent);
+    const onBeforeInstall = (e: Event) => {
+      // Solo tomamos el control del aviso si de verdad vamos a mostrar el nuestro (móvil, sin descartar,
+      // sin estar ya instalada). Si no, NO llamamos a preventDefault: así el navegador conserva su
+      // propio aviso y no aparece el mensaje "Banner not shown: preventDefault() called".
+      const standalone = window.matchMedia("(display-mode: standalone)").matches;
+      if (wasDismissed() || standalone || !window.matchMedia(MOBILE_QUERY).matches) return;
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
-    const onInstalled = () => setEvt(null);
-    window.addEventListener("beforeinstallprompt", onPrompt);
+    const onInstalled = () => setDeferredPrompt(null);
+
+    window.addEventListener("beforeinstallprompt", onBeforeInstall);
     window.addEventListener("appinstalled", onInstalled);
     return () => {
-      window.removeEventListener("beforeinstallprompt", onPrompt);
+      window.removeEventListener("beforeinstallprompt", onBeforeInstall);
       window.removeEventListener("appinstalled", onInstalled);
     };
   }, []);
 
-  if (!evt) return null;
-
-  const close = () => {
-    try {
-      localStorage.setItem(KEY, "1");
-    } catch {
-      /* almacenamiento bloqueado */
-    }
-    setEvt(null);
-  };
+  if (!deferredPrompt) return null;
 
   const install = async () => {
-    await evt.prompt();
-    await evt.userChoice.catch(() => null);
-    setEvt(null); // el evento solo puede usarse una vez
+    const evt = deferredPrompt;
+    setDeferredPrompt(null); // el evento solo sirve una vez; ocultamos el banner ya
+    try {
+      await evt.prompt(); // aquí el navegador muestra su diálogo de instalación
+      const { outcome } = await evt.userChoice;
+      if (outcome === "dismissed") remember(); // dijo que no: no insistimos
+    } catch {
+      /* prompt() ya consumido o bloqueado */
+    }
+  };
+
+  const close = () => {
+    remember();
+    setDeferredPrompt(null);
   };
 
   return (
     <div
       role="dialog"
       aria-label="Instalar la aplicación"
-      // md:hidden: solo móvil. bottom-20 deja libre el anuncio sticky inferior.
+      // bottom-20 deja libre el anuncio sticky inferior
       className="fixed inset-x-3 bottom-20 z-50 flex items-center gap-3 rounded-2xl border border-neutral-700 bg-neutral-900/95 p-3 shadow-xl backdrop-blur md:hidden"
     >
       <p className="flex-1 text-sm leading-snug text-neutral-100">
